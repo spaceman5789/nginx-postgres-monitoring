@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Вход и регистрация</title>
+    <style>
+      :root {
+        --bg: #f5f1e8;
+        --card: #fffdf8;
+        --text: #1e293b;
+        --muted: #64748b;
+        --accent: #d97706;
+        --accent-hover: #b45309;
+        --border: #e2e8f0;
+        --error: #b91c1c;
+        --success: #166534;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text);
+        background: radial-gradient(circle at top right, #fde68a 0%, var(--bg) 45%, #f8fafc 100%);
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 440px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 1.6rem;
+      }
+
+      .subtitle {
+        margin: 0 0 18px;
+        color: var(--muted);
+      }
+
+      .tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 18px;
+      }
+
+      .tab {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #fff;
+        padding: 10px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .tab.active {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: #fff7ed;
+      }
+
+      form {
+        display: none;
+        gap: 14px;
+      }
+
+      form.active {
+        display: grid;
+      }
+
+      label {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      input {
+        width: 100%;
+        margin-top: 6px;
+        padding: 11px 12px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 1rem;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+      }
+
+      button[type="submit"] {
+        margin-top: 4px;
+        border: none;
+        border-radius: 10px;
+        padding: 12px;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #fff;
+        background: var(--accent);
+        cursor: pointer;
+      }
+
+      button[type="submit"]:hover {
+        background: var(--accent-hover);
+      }
+
+      .message {
+        margin-top: 8px;
+        font-size: 0.92rem;
+        min-height: 20px;
+      }
+
+      .message.error { color: var(--error); }
+      .message.success { color: var(--success); }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <h1>Личный кабинет</h1>
+      <p class="subtitle">По умолчанию открыт вход. Можно переключиться на регистрацию.</p>
+
+      <div class="tabs">
+        <button class="tab active" id="tab-login" type="button">Вход</button>
+        <button class="tab" id="tab-register" type="button">Регистрация</button>
+      </div>
+
+      <form id="login-form" class="active">
+        <label>
+          Email или телефон
+          <input type="text" name="login" placeholder="example@mail.com или +7 999 123-45-67" required />
+        </label>
+        <label>
+          Пароль
+          <input type="password" name="password" placeholder="Введите пароль" required />
+        </label>
+        <button type="submit">Войти</button>
+        <div class="message" id="login-message"></div>
+      </form>
+
+      <form id="register-form">
+        <label>
+          Имя
+          <input type="text" name="name" placeholder="Иван Иванов" required />
+        </label>
+        <label>
+          Номер телефона
+          <input type="tel" name="phone" placeholder="+7 999 123-45-67" required />
+        </label>
+        <label>
+          Email
+          <input type="email" name="email" placeholder="example@mail.com" required />
+        </label>
+        <label>
+          Пароль
+          <input type="password" name="password" placeholder="Минимум 6 символов" minlength="6" required />
+        </label>
+        <button type="submit">Зарегистрироваться</button>
+        <div class="message" id="register-message"></div>
+      </form>
+    </main>
+
+    <script>
+      const USERS_KEY = "local_base_users";
+
+      const tabLogin = document.getElementById("tab-login");
+      const tabRegister = document.getElementById("tab-register");
+      const loginForm = document.getElementById("login-form");
+      const registerForm = document.getElementById("register-form");
+      const loginMessage = document.getElementById("login-message");
+      const registerMessage = document.getElementById("register-message");
+
+      function getUsers() {
+        try {
+          return JSON.parse(localStorage.getItem(USERS_KEY)) || [];
+        } catch {
+          return [];
+        }
+      }
+
+      function setUsers(users) {
+        localStorage.setItem(USERS_KEY, JSON.stringify(users));
+      }
+
+      function showTab(tab) {
+        const loginActive = tab === "login";
+        tabLogin.classList.toggle("active", loginActive);
+        tabRegister.classList.toggle("active", !loginActive);
+        loginForm.classList.toggle("active", loginActive);
+        registerForm.classList.toggle("active", !loginActive);
+        loginMessage.textContent = "";
+        loginMessage.className = "message";
+        registerMessage.textContent = "";
+        registerMessage.className = "message";
+      }
+
+      tabLogin.addEventListener("click", () => showTab("login"));
+      tabRegister.addEventListener("click", () => showTab("register"));
+
+      registerForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const formData = new FormData(registerForm);
+        const name = String(formData.get("name") || "").trim();
+        const email = String(formData.get("email") || "").trim().toLowerCase();
+        const phone = String(formData.get("phone") || "").trim();
+        const password = String(formData.get("password") || "");
+
+        const users = getUsers();
+        const duplicate = users.find((user) => user.email === email || user.phone === phone);
+
+        if (duplicate) {
+          registerMessage.textContent = "Ошибка: аккаунт с таким email или телефоном уже существует.";
+          registerMessage.className = "message error";
+          return;
+        }
+
+        users.push({ name, email, phone, password });
+        setUsers(users);
+        registerForm.reset();
+        registerMessage.textContent = "Регистрация успешна. Теперь можно войти.";
+        registerMessage.className = "message success";
+      });
+
+      loginForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const formData = new FormData(loginForm);
+        const login = String(formData.get("login") || "").trim().toLowerCase();
+        const password = String(formData.get("password") || "");
+
+        const users = getUsers();
+        const found = users.find((user) => {
+          const userEmail = String(user.email || "").toLowerCase();
+          const userPhone = String(user.phone || "").toLowerCase();
+          const userPassword = String(user.password || "");
+          return (userEmail === login || userPhone === login) && userPassword === password;
+        });
+
+        if (!found) {
+          loginMessage.textContent = "Неверный логин (email/телефон) или пароль.";
+          loginMessage.className = "message error";
+          return;
+        }
+
+        loginMessage.textContent = "Вход выполнен успешно.";
+        loginMessage.className = "message success";
+      });
+    </script>
+  </body>
+</html>

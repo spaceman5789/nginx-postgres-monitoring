@@ -1,0 +1,38 @@
+groups:
+  - name: local-base-alerts
+    rules:
+      - alert: PostgresExporterDown
+        expr: up{job="postgres_exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Postgres exporter is down"
+          description: "Prometheus cannot scrape postgres-exporter for more than 1 minute."
+
+      - alert: NginxExporterDown
+        expr: up{job="nginx_exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Nginx exporter is down"
+          description: "Prometheus cannot scrape nginx-exporter for more than 1 minute."
+
+      - alert: PrometheusTargetDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "A scrape target is down"
+          description: "Target {{ $labels.instance }} in job {{ $labels.job }} is unreachable."
+
+      - alert: PostgresTooManyConnections
+        expr: sum(pg_stat_database_numbackends) > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PostgreSQL connection count is high"
+          description: "Total PostgreSQL connections are above 100 for 5 minutes."

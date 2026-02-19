@@ -1,0 +1,69 @@
+{
+  "id": null,
+  "uid": "nginx-overview-local",
+  "title": "Nginx Overview",
+  "tags": ["nginx", "local"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "15s",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Nginx Exporter Up",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        { "expr": "up{job=\"nginx_exporter\"}", "legendFormat": "status", "refId": "A" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value": 0 }, { "color": "green", "value": 1 } ] }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "HTTP Requests/s",
+      "gridPos": { "h": 8, "w": 18, "x": 6, "y": 0 },
+      "targets": [
+        { "expr": "rate(nginx_http_requests_total[5m])", "legendFormat": "req/s", "refId": "A" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Active Connections",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "targets": [
+        { "expr": "nginx_connections_active", "legendFormat": "active", "refId": "A" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Connection States",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        { "expr": "nginx_connections_reading", "legendFormat": "reading", "refId": "A" },
+        { "expr": "nginx_connections_writing", "legendFormat": "writing", "refId": "B" },
+        { "expr": "nginx_connections_waiting", "legendFormat": "waiting", "refId": "C" }
+      ]
+    }
+  ],
+  "templating": { "list": [] },
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  }
+}

@@ -15,9 +15,9 @@ services:
     image: postgres:16-alpine
     container_name: postgres
     environment:
-      POSTGRES_DB: app_db
-      POSTGRES_USER: app_user
-      POSTGRES_PASSWORD: app_password
+      POSTGRES_DB: ${POSTGRES_DB:-app_db}
+      POSTGRES_USER: ${POSTGRES_USER:-app_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app_password}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -50,7 +50,7 @@ services:
     image: prometheuscommunity/postgres-exporter:latest
     container_name: postgres-exporter
     environment:
-      DATA_SOURCE_NAME: postgresql://app_user:app_password@db:5432/app_db?sslmode=disable
+      DATA_SOURCE_NAME: postgresql://${POSTGRES_USER:-app_user}:${POSTGRES_PASSWORD:-app_password}@db:5432/${POSTGRES_DB:-app_db}?sslmode=disable
     depends_on:
       - db
     restart: unless-stopped
